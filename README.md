@@ -6,7 +6,7 @@ for instance to match a different data sample.
 
 
 # Usage:
- subrand.py -i <inputfile> -t <faqtype> -c <coverage> -r <refsize> -m <mean> -s <std>
+ subrand.py -i \<inputfile\> -t \<faqtype\> -c \<coverage\> -r \<refsize\> -m \<mean\> -s \<std\>
  
     input file: fasta or fastq file of reads from which extract a subsample
     
@@ -16,6 +16,4 @@ for instance to match a different data sample.
    
    refsize: reference size or expected genome size needed to calculate coverage, in Mb
    
-   mean,std: mean and standard deviation of read lengths distribution desired for subsample. 
-   
-             If not defined, reads are randomly selected uniformly in read length
+   mean,std: mean and standard deviation of read lengths distribution desired for subsample. If not defined, reads are randomly selected uniformly in read length
