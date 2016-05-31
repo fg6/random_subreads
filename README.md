@@ -5,8 +5,8 @@ The subsample can be selected having read length distribution with a chosen mean
 for instance to match a different data sample.
 
 
-# Usage:
- subrand.py -i \<inputfile\> -t \<faqtype\> -c \<coverage\> -r \<refsize\> -m \<mean\> -s \<std\>
+### Usage:
+ ### subrand.py -i \<inputfile\> -t \<faqtype\> -c \<coverage\> -r \<refsize\> -m \<mean\> -s \<std\>
  
  input file: fasta or fastq file of reads from which extract a subsample
  
