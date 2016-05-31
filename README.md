@@ -6,9 +6,11 @@ for instance to match a different data sample.
 
 
 ### Usage:
- ### subrand.py -i \<inputfile\> -t \<faqtype\> -c \<coverage\> -r \<refsize\> -m \<mean\> -s \<std\>
+#### subrand.py -i \<inputfile\> -t \<faqtype\> -c \<coverage\> -r \<refsize\> -m \<mean\> -s \<std\>
  
- input file: fasta or fastq file of reads from which extract a subsample
+where:
+
+  input file: fasta or fastq file of reads from which extract a subsample
  
    faqtype: format of output file, fasta or fastq
    
