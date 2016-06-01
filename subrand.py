@@ -88,7 +88,12 @@ def main(argv):
       sys.exit(2)
    for opt, arg in opts:
       if opt == '-h':
-         print 'test.py -i <inputfile> -t <faqtype>'
+         print 'test.py -i <inputfile> -t <faqtype> -c <coverage> -r <refsize> -m <mean> -s <std>'
+         print '  input file: fasta or fastq file of reads from which extract a subsample'
+         print '  faqtype: format of output file, fasta or fastq'
+         print '  coverage: desired coverage for subsample'
+         print '  refsize: reference size or expected genome size needed to calculate coverage, in Mb'
+         print '  mean,std: mean and standard deviation of read lengths desired for subsample. If not defined, a uniform random selection of reads is performed' 
          sys.exit()
       elif opt in ("-i", "--ifile"):
          inputfile = arg
