@@ -5,14 +5,6 @@ from Bio import SeqIO
 import random
 
 
-def filetype(value, a):
-    pos_a = value.rfind(a)
-    if pos_a == -1: return ""
-    adjusted_pos_a = pos_a + len(a)
-    if adjusted_pos_a >= len(value): return ""
-    return value[adjusted_pos_a:]
-
-
 def read(inputfile,faqtype,cov,refsize):
   records = (r for r in SeqIO.parse(inputfile, faqtype))
   totall=0.0
@@ -111,7 +103,7 @@ def main(argv):
       elif opt in ("-s", "--std"):
          std = float(arg)
 
-   type=filetype(inputfile,".")
+   type=inputfile.split(".")[-1]
    if type == "fq":
     faqtype="fastq"
    elif type == "fa":
