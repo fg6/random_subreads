@@ -20,4 +20,4 @@ where:
    mean,std: mean and standard deviation of read lengths distribution desired for subsample. If not defined, reads are randomly selected uniformly in read length
 
 ### Requirements:
-Tested on Python 2 and Python 3, modules needed: biopython, numpy, matplotlib
+Python 2 or 3, modules needed: biopython, numpy, matplotlib
