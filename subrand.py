@@ -118,7 +118,8 @@ def readnrandom(inputfile,faqtype,ofaqtype,cov,refsize):
     print "  Final number of bases=%0.0f,  Coverage=%0.1fX" % (mysum,float(mysum)/refsize)
     print "  Initial read length mean:%0.1f  Final read length mean=%0.1f" %(allmean/i,mysum/ii)
 
-  ofile="subreads_%sX.%s" % (cov,ofaqtype)
+  ofile="subreads_%0.0fX.%s" % (cov,ofaqtype)
+  if mean > 0: ofile="subreads_%0.0fX_mean%d.%s" % (cov,mysum/ii,ofaqtype)
   output_handle = open(ofile,"w")
   SeqIO.write(readlist, output_handle,ofaqtype )
   output_handle.close()
