@@ -6,8 +6,8 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+import os.path
 
- ### this is a test ###
 plot=1
 
 totall=0
@@ -16,24 +16,49 @@ subreads=[]
 meantot=0
 mean=0
 std=1000
-warning=0.6
+warning=0.6 # about min ratio of coverage needed/initial coverage (avg prob for a read to get chosen if inside the gaussian peak)
 
 def read(inputfile,faqtype,cov,refsize):
   records = (r for r in SeqIO.parse(inputfile, faqtype)) 
   global totall
   global readall
   global meantot
-  
-
+  global inin
+  global bins
+  global maxN
+  global totN
+  global weigth
+  weigth=1.
+  totN=0
+  loctot=0
   for r in records:
      totall+=len(r.seq) 
      readall.append(len(r.seq))
-     if mean > 0 and len(r.seq)< mean+2*std and len(r.seq)> mean-2*std: meantot+= len(r.seq)
+     if mean > 0 and len(r.seq)< mean+2*std and len(r.seq)> mean-2*std: 
+        meantot+= len(r.seq)
+        loctot+= 1
+     totN+=1
 
   if mean == 0:
     pcov=totall/refsize
+    pmean=totall/totN
+    thisTot=totN
   else:
     pcov=meantot/refsize
+    pmean=meantot/loctot
+    thisTot=loctot
+
+  # delete this?? 
+  [inin,bins]=np.histogram(readall, 20)
+  maxN=max(inin)
+
+  #neededN=thisTot*(cov/pcov)*(mean/pmean)/warning
+  #neededN=thisTot*(cov/mean)*(pmean/pcov)
+  #neededN=(warning+0.05)*thisTot
+
+  weigth=1  #(neededN/totN)+warning # slightly reduce weigth to make sure you almost reach the end of the reads, to account for non-randomness distri in the read order
+  #print(" need ",neededN," reads, percentage of total is",neededN/totN,"weigth=",weigth," tot-needed:",totN-neededN)
+  #weigth=0.8 
 
   if(cov > pcov): 
     print ("\n Sorry your original file does not have enough coverage! \n  Total coverage in the selected area=%0.1fX, desired coverage=%0.1fX" % (pcov, cov))
@@ -58,6 +83,7 @@ def plotnow():
     plt.hist(readall,100,histtype='step',color='b',label="All")
     plt.hist(subreads,100,histtype='step',color='r',label="Sub")
 
+
      
     plt.tight_layout()
     plt.show()
@@ -70,14 +96,27 @@ def plotnow():
 def gaussian(x, mu, sig):
     return 1.*np.exp(-np.power((x - mu)/sig, 2.)/2)
 
+def findN(length):
+   global inin
+   global bins
+
+
+   mybin=-1
+   for b in range(1,len(bins)):
+     if length > bins[b-1] and length < bins[b]: mybin=b-1
+     if mybin != -1: break
+   return inin[mybin]
+
+
 def readnrandom(inputfile,faqtype,ofaqtype,cov,refsize): 
 
   global subreads
-  records = (r for r in SeqIO.parse(inputfile, faqtype))
+
+
+  records = list(SeqIO.parse(inputfile, faqtype))
   readlist=[]
  
-  allhist, edges =  np.histogram(readall, bins=100)
-
+  
   if(mean==0):
     mytotal=totall
   else:
@@ -87,32 +126,54 @@ def readnrandom(inputfile,faqtype,ofaqtype,cov,refsize):
   allmean=0
   i=-1
   ii=0
-  for r in records:
-   allmean+=len(r.seq)
+
+  # choose a random, non-repetitive order:
+  randord=[]
+  listord=range(0,len(records))
+#  listord=range(0,10)
+  nn=len(listord)
+  
+  for ir in range(0,nn):
+    thisr=random.choice(listord)      #random.randint(0,len(records))
+    randord.append(thisr)
+    listord.remove(thisr)
+
+
+  for ir in randord:
+   
+   thisl=len(records[ir].seq)
+   allmean+=thisl   #len(r.seq)
    i+=1
+   if i<10: print(i,ir,thisl)
+
    if mysum/refsize > cov:
-    if(1<0): print (cov, "% hit!")
+    if(1<2): print (cov, "% hit!",i,totN)
+    break
    else: 
     test=0
+
+    #thisN=findN(thisl)   #len(r.seq))
+
 
     if(mean==0):
       value=1-cov/(mytotal/refsize)
       ran=random.randint(0,100)
       if ran > value: test=1
     else:
-       #value=cov/(mytotal/refsize)
-       model=gaussian(len(r.seq),mean,std)
-       sigma_up=model      
+       model=gaussian(thisl,mean,std) #+gaussian(thisl,mean-3000,std) 
+       sigma_up=model*weigth  
        ran=random.uniform(0,1)
 
        if ran <= sigma_up: test=1
 
     if test:  
-     readlist.append(r)
-     mysum+=len(r.seq)
-     subreads.append(len(r.seq))
+     readlist.append(records[ir])
+     mysum+=thisl   
+     subreads.append(thisl) 
      ii+=1
- 
+
+
+  print("Min subread:",min(subreads), " tot subreads: ", ii)
 
   if(float(mysum)/refsize < cov): 
     print (" Finished: could not extract enough coverage, extracted coverage=%0.2fX" % (float(mysum)/refsize))
@@ -171,7 +232,11 @@ def main(argv):
    if len(inputfile) == 0 or cov ==0 or refsize ==0:
       usage()
       sys.exit(2)
- 
+   if not os.path.exists(inputfile): 
+      print("Sorry, file ", inputfile, "does not exists")
+      sys.exit(2)
+
+
    type=inputfile.split(".")[-1]
    if type == "fq":
     faqtype="fastq"
