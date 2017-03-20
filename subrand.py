@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import os.path
 
-plot=1
+plot=0
 
 totall=0
 readall=[]
