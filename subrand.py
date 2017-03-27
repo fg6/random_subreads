@@ -222,12 +222,12 @@ def readnrandom(inputfile,faqtype,ofaqtype,cov,refsize):
     print (" Final number of bases=%0.0f,  Coverage=%0.0fX" % (mysum,float(mysum)/refsize))
     print (" Initial read mean-length: %0.1f  Final read mean-length: %0.1f" %(allmean/i,mysum/ii))
 
-  #ofile="subreads_%0.0fX.%s" % (cov,ofaqtype)
-  #if mean > 0: ofile="subreads_%0.0fX_mean%d.%s" % (cov,mysum/ii,ofaqtype)
-  #output_handle = open(ofile,"w")  
-  #SeqIO.write(readlist, output_handle,ofaqtype )
-  #output_handle.close()
-  #print (" Subsample written in",ofile,", read length distribution plotted in lengths.pdf\n")
+  ofile="subreads_%0.0fX.%s" % (cov,ofaqtype)
+  if mean > 0: ofile="subreads_%0.0fX_mean%d.%s" % (cov,mysum/ii,ofaqtype)
+  output_handle = open(ofile,"w")  
+  SeqIO.write(readlist, output_handle,ofaqtype )
+  output_handle.close()
+  print (" Subsample written in",ofile,", read length distribution plotted in lengths.pdf\n")
 
 
 def usage():
