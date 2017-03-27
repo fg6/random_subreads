@@ -5,7 +5,7 @@ The subsample can be randomly selected or selected having the read lengths follo
 
 
 ### Usage:
-#### subrand.py -i \<inputfile\> -t \<faqtype\> -c \<coverage\> -r \<refsize\> -m \<mean\> -s \<std\>  -p \<compfile\> 
+#### subrand.py -i \<inputfile\> -t \<faqtype\> -c \<coverage\> -r \<refsize\> -m \<mean\> -s \<std\> -o \<omean\> -u \<ostd\>  -f \<corrfact\>    -p \<compfile\>  
  
 where:
 
@@ -19,6 +19,8 @@ where:
    
    mean,std: mean and standard deviation of read lengths distribution desired for subsample. If not defined, reads are randomly selected 
 
+   omean,ostd,corrfact: to get a gaussian shape you likely need to suppress the area around the original read-length peak: set here original mean, original std, and correction factor (0:1), 0 being not corrected, maximally corrected. If not defined, oringinal shape not corrected for, subset gaussian shape will likely be deformed 
+
    compfile: fasta or fastq file of reads to compare to the subsample read length distribution
 
 ### Output:
@@ -30,10 +32,15 @@ where:
                                [c] if mean and std are selected: a gaussian with mean and std, having the same area as (b)
 			       [d] if a compfile is defined: the read length distribution of the cmopfile 
 
-### Warnings:
-   When mean and std are defined, the shape of the subsample will be roughly gaussian, but the actual shape is affected by the
-   original distribution. Generally, the more the desired coverage is close to the original one, the more the shape will differ from a gaussian.
-   Will try generalize the script to become more independent from the original shape sometime in the future.
+### Warnings: 
+   With the random selection, each read has the same probability to be picked, but as the original read-length distribution will follow a peaked shape,
+   read-lengths around the peak will have higher chances to get picked, as there are more reads in that area. Thus the random selection will reproduce
+   the original shape but at a lower depth (chosen by the parameter -c). 
+   When mean and std are defined, the probability to get picked has been modified to follow the shape of a gaussian, but the actual shape is still affected by the
+   original distribution. Generally the more the desired coverage is close to the original one, or the further from a flat distribution is the original shape
+   the more the final shape will differ from a gaussian.
+   The gaussian option is not optimized, you can try to correct for the original shape by using the parameters -o, -u and -f, but a manual correction 
+   of the original shape might be necessary.
 
 ### Requirements:
 Python 2 or 3, modules needed: biopython, numpy, matplotlib
