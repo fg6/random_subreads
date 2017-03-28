@@ -96,7 +96,6 @@ def read(inputfile,faqtype,cov,refsize):
     return 0
 
 def compare(cfile,faqtype):
-  print("reading comp file")
   comparec = (r for r in SeqIO.parse(cfile, faqtype)) 
   for r in comparec:
      compall.append(len(r.seq))
@@ -112,20 +111,15 @@ def plotnow():
      
     binwidth=400
     fig = plt.figure()
-    plt.hist(readall, bins=np.arange(0, max(readall) + binwidth, binwidth),histtype='step',color='b',label="Initial reads")
-    values, bins, _ = plt.hist(subreads,bins=np.arange(0, max(subreads) + binwidth, binwidth),histtype='step',color='r',label="Sub-selected reads")
+    plt.hist(readall, bins=np.arange(0, max(readall) + binwidth, binwidth),histtype='step',color='b',label="Initial PacBio reads")
+    values, bins, _ = plt.hist(subreads,bins=np.arange(0, max(subreads) + binwidth, binwidth),histtype='step',color='r',label="Sub-selected PacBio reads")
     if len(compall) > 0:
-      plt.hist(compall,bins=np.arange(0, max(compall) + binwidth, binwidth),histtype='step',color='g',label="Comparison reads")
+      plt.hist(compall,bins=np.arange(0, max(compall) + binwidth, binwidth),histtype='step',color='g',label="ONT-to-emulate reads")
 
 
     plt.legend(bbox_to_anchor=(0, 0, 1, 1), loc="upper right", borderaxespad=0.,fontsize=10, title='Read length distribution')
 
 
-    # plot gaussian
-    #if(mean is not 0):
-    #  sub_area = sum(np.diff(bins)*values)
-    #  x = np.linspace(0, max(readall), 100)
-    #  plt.plot(x,norm.pdf(x, mean, std)*sub_area,color='r')
       
     plt.ylabel('N')
     plt.xlabel('Read lengths')
@@ -153,16 +147,13 @@ def readnrandom(inputfile,faqtype,ofaqtype,cov,refsize):
     xx = np.linspace(0, max(readall), 100)
     vv=[gaussian(x,mean,std) for x in xx]
     gmax=max(vv)   
-    #mean2=1000
-    #std2=4000
-    #vv2=[gaussian(x,mean2,std2) for x in xx]
-    #gmax2=max(vv2)   
-    #mo=1350
-    #stdo=5000
+    vv2=[gaussian(x,mean2,std2) for x in xx]
+    gmax2=max(vv2)   
     vv3=[gaussian(x,omean,ostd) for x in xx]
     gmax3=max(vv3)   
 
  
+  
   if(mean==0):
     mytotal=totall
   else:
@@ -190,14 +181,10 @@ def readnrandom(inputfile,faqtype,ofaqtype,cov,refsize):
       ran=random.randint(0,100)
       if ran > value: chosen=1
     else:
-      # does not work well... 
-      #weigth=1
-      #if(thislen<3000): weigth=0.8
-      #model1=(gaussian(thislen,mean,std)/gmax) #*weigth
-            
+     
       model1=1*gaussian(thislen,mean,std)/gmax
       if model1>1: model1=1.
-      model2=0
+      model2=0.28*gaussian(thislen,mean2,std2)/gmax2 
       model3=corrfact*gaussian(thislen,omean,ostd)/gmax3
 
 
@@ -230,70 +217,58 @@ def readnrandom(inputfile,faqtype,ofaqtype,cov,refsize):
   print (" Subsample written in",ofile,", read length distribution plotted in lengths.pdf\n")
 
 
-def usage():
-  print (' Missing required variables ! Usage: ')
-  print (' subrand.py -i <inputfile> -t <faqtype> -c <coverage> -r <refsize> -m <mean> -s <std>  -x <compfile>')
-  print ('\n  input file: fasta or fastq file of reads from which extract a subsample')
-  print ('  faqtype: format of output file, fasta or fastq [fasta]')
-  print ('  coverage: desired coverage for subsample')
-  print ('  refsize: reference size or expected genome size needed to calculate coverage, in Mb ')
-  print ('  mean,std: mean and standard deviation of read lengths desired for subsample. If not defined, a uniform random selection of reads is performed')
-  print ('  compfile: comparison file:  fasta or fastq file of reads to compare with the subsample')
-
-
 def main(argv):
-   inputfile = ''
-   compfile = ''
-   ofaqtype = 'fasta'
-   cov = 0
-   refsize = 0
+   global cov
    global mean
    global std
    global omean
    global ostd
+   global mean2
+   global std2
    global randord
    global corrfact
-
    randord=[]
 
-
+   inputfile = '19503.fastq'
+   ofaqtype = 'fastq'
+   cov = 31
+   refsize = 12*1000000
+ 
+   mean=25000
+   std=12000
+   omean = 2500
+   ostd = 5000
+   corrfact = 0.3
+   mean2=1000
+   std2=4000
+           
+   
    try:
-      (opts, args) = getopt.getopt(argv,"i:t:c:r:m:s:p:o:u:f:",["ifile=","faqtype=","cov=","refsize=","mean=","std=","compfile=","origmean","origstd","corrfactor"])   
+     (opts, args) = getopt.getopt(argv,"c:",["cov="])  
+ 
    except getopt.GetoptError:
-      usage()
-      sys.exit(2)
+     usage()
+     sys.exit(2)
    for opt, arg in opts:
      if opt == '-h':
        usage()
        sys.exit()
-     elif opt in ("-i", "--ifile"):
-       inputfile = arg
-     elif opt in ("-p", "--cfile"):
-       compfile = arg
-     elif opt in ("-t", "--faqtype"):
-       ofaqtype = arg
      elif opt in ("-c", "--cov"):
        cov = float(arg)
-     elif opt in ("-r", "--refsize"):
-       refsize = float(arg)*1000000
-     elif opt in ("-m", "--mean"):
-       mean = float(arg)
-     elif opt in ("-s", "--std"):
-       std = float(arg)
-     elif opt in ("-o", "--omean"):
-       omean = float(arg)
-     elif opt in ("-u", "--ostd"):
-       ostd = float(arg)
-     elif opt in ("-f", "--corrfac"):
-       corrfact = float(arg)
-          
-   print(compfile)
+
+
    if len(inputfile) == 0 or cov ==0 or refsize ==0:
-      usage()
-      sys.exit(2)
+     sys.exit(2)
    if not os.path.exists(inputfile): 
-      print("Sorry, file ", inputfile, "does not exists")
-      sys.exit(2)
+     print("Sorry, file ", inputfile, "does not exists")
+     sys.exit(2)
+
+
+   compfile = 's288c_ontreads_pass_plus2r9.fq'
+   if cov == 10:  
+     compfile = 's288c_ontreads_pass10X_plus2r9.fq'
+   elif cov == 20:  
+     compfile = 's288c_ontreads_pass20X_plus2r9.fq'
 
 
    type=inputfile.split(".")[-1]
@@ -307,10 +282,7 @@ def main(argv):
       
    print ("\n Getting a", "{:.0f}".format(cov),"X subsample of reads from", inputfile)
    print ("   (Coverage calculated for a reference size of %0.1f Mb)" % (refsize/1000000))
-  
-
-  # print(mean,omean,ostd,corrfact)
-   
+     
    
    # read file and check if enough data for desired subsample
    ok=read(inputfile,faqtype,cov,refsize)
@@ -326,7 +298,7 @@ def main(argv):
      else:
        faqctype=ctype
 
-     compare(compfile,faqctype)
+     compare(compfile,'fastq')
    if(ok==0): 
      readnrandom(inputfile,faqtype,ofaqtype,cov,refsize)    
      if(plot):
