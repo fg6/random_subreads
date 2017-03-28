@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import os.path
-from scipy.stats import norm
+
 
 plot=1
 
@@ -244,7 +244,7 @@ def main(argv):
            
    
    try:
-     (opts, args) = getopt.getopt(argv,"c:",["cov="])  
+     (opts, args) = getopt.getopt(argv,"i:c:p:",["ifile=","cov=","compfile="])
  
    except getopt.GetoptError:
      usage()
@@ -253,8 +253,12 @@ def main(argv):
      if opt == '-h':
        usage()
        sys.exit()
+     elif opt in ("-i", "--ifile"):
+       inputfile = arg
      elif opt in ("-c", "--cov"):
        cov = float(arg)
+     elif opt in ("-p", "--cfile"):
+       compfile = arg
 
 
    if len(inputfile) == 0 or cov ==0 or refsize ==0:
@@ -262,14 +266,6 @@ def main(argv):
    if not os.path.exists(inputfile): 
      print("Sorry, file ", inputfile, "does not exists")
      sys.exit(2)
-
-
-   compfile = 's288c_ontreads_pass_plus2r9.fq'
-   if cov == 10:  
-     compfile = 's288c_ontreads_pass10X_plus2r9.fq'
-   elif cov == 20:  
-     compfile = 's288c_ontreads_pass20X_plus2r9.fq'
-
 
    type=inputfile.split(".")[-1]
    if type == "fq":
@@ -297,8 +293,8 @@ def main(argv):
        faqctype="fasta"
      else:
        faqctype=ctype
-
-     compare(compfile,'fastq')
+ 
+     compare(compfile,faqctype)
    if(ok==0): 
      readnrandom(inputfile,faqtype,ofaqtype,cov,refsize)    
      if(plot):
