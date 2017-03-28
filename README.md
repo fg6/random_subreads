@@ -1,27 +1,19 @@
 # random_subreads
 
-Python script to randomly select a subsample of reads with desired coverage from a fasta or fastq file.
-The subsample can be randomly selected or selected having the read lengths following a gaussian distribution with a chosen mean and standard deviation, for instance to match a different data sample.
-
+Python script for subsampling PacBio reads for the study ERP021971 (will add reference when available). 
+This script need as input the location of the PacBio file and the coverage to extract. The final shape of the
+subsample is selected according to the shape of the ONT dataset (2D-Pass 31X S288c) (will add reference when available).
 
 ### Usage:
-#### subrand.py -i \<inputfile\> -t \<faqtype\> -c \<coverage\> -r \<refsize\> -m \<mean\> -s \<std\> -o \<omean\> -u \<ostd\>  -f \<corrfact\>    -p \<compfile\>  
+#### subrand.py -i \<inputfile\>  -c \<coverage\> -p \<compfile\>  
  
 where:
 
-  input file: fasta or fastq file of reads from which extract a subsample
- 
-   faqtype: format of output file, fasta or fastq  [fasta]
-   
-   coverage: desired coverage for subsample
-   
-   refsize: reference size or expected genome size needed to calculate coverage, in Mb
-   
-   mean,std: mean and standard deviation of read lengths distribution desired for subsample. If not defined, reads are randomly selected 
+  input file: PacBio fasta or fastq file of reads from which to extract a subsample
+    
+  coverage: desired coverage for subsample [31]  
 
-   omean,ostd,corrfact: to get a gaussian shape you likely need to suppress the area around the original read-length peak: set here original mean, original std, and correction factor (0:1), 0 being not corrected, maximally corrected. If not defined, oringinal shape not corrected for, subset gaussian shape will likely be deformed 
-
-   compfile: fasta or fastq file of reads to compare to the subsample read length distribution
+  compfile: (optional) fastq file of ONT reads 
 
 ### Output:
 
@@ -32,15 +24,16 @@ where:
                                [c] if mean and std are selected: a gaussian with mean and std, having the same area as (b)
 			       [d] if a compfile is defined: the read length distribution of the cmopfile 
 
-### Warnings: 
-   With the random selection, each read has the same probability to be picked, but as the original read-length distribution will follow a peaked shape,
-   read-lengths around the peak will have higher chances to get picked, as there are more reads in that area. Thus the random selection will reproduce
-   the original shape but at a lower depth (chosen by the parameter -c). 
-   When mean and std are defined, the probability to get picked has been modified to follow the shape of a gaussian, but the actual shape is still affected by the
-   original distribution. Generally the more the desired coverage is close to the original one, or the further from a flat distribution is the original shape
-   the more the final shape will differ from a gaussian.
-   The gaussian option is not optimized, you can try to correct for the original shape by using the parameters -o, -u and -f, but a manual correction 
-   of the original shape might be necessary.
+### Data
+   The PacBio data used in the paper are from the S288C strain of Saccharomyces cerevisiae, accession numbers: ERR1655125 ERR1655118 ERR1655119
+   To use this this script download the PacBio folders for the mentioned accession numbers and extract fastq reads in a pacbio.fastq file, then run
+   the script as:  python subrand.py -i pacbio.fastq 
+   To compare in a figure the extracted subsample distribution and the ONT distribution, download the data from accession numbers
+   ERR1883389 ERR1883398 ERR1883399 ERR1883400 ERR1883401 ERR1883402 and generate a fastq file from the 2D Pass reads in a ont.fastq file, then run
+   the script as: python subrand.py -i pacbio.fastq -p ont.fastq
+
+### Warnings
+   This branch works only for the special case described above, as the final subsample shape is fixed. For a more general case use the master branch.
 
 ### Requirements:
 Python 2 or 3, modules needed: biopython, numpy, matplotlib
