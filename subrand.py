@@ -220,9 +220,9 @@ def readnrandom(inputfile,faqtype,ofaqtype,cov,refsize):
 def usage():
   print (' Missing required variables ! Usage: ')
   print (' subrand.py -i <inputfile>  -c <coverage> -x <compfile>')
-  print ('\n  input file: fasta or fastq file of reads from which extract a subsample')
+  print ('  input file: fasta or fastq file of reads from which extract a subsample')
   print ('  coverage: desired coverage for subsample [31X]')
-  print ('  compfile: comparison file:  fasta or fastq file of reads to compare with the subsample')
+  print ('  compfile: comparison file:  fasta or fastq file of reads to compare with the subsample\n')
 
   print (' This branch is to run only the PacBio ont-emu case described in paper [add_ref_when_available]')
   print (' For a more general case, check the master branch in https://github.com/fg6/random_subreads.git')
