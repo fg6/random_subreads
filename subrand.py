@@ -262,6 +262,7 @@ def main(argv):
 
 
    if len(inputfile) == 0 or cov ==0 or refsize ==0:
+     usage()
      sys.exit(2)
    if not os.path.exists(inputfile): 
      print("Sorry, file ", inputfile, "does not exists")
