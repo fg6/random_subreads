@@ -254,7 +254,7 @@ def main(argv):
            
    
    try:
-     (opts, args) = getopt.getopt(argv,"i:c:p:",["ifile=","cov=","compfile="])
+     (opts, args) = getopt.getopt(argv,"i:c:x:",["ifile=","cov=","compfile="])
  
    except getopt.GetoptError:
      usage()
@@ -267,7 +267,7 @@ def main(argv):
        inputfile = arg
      elif opt in ("-c", "--cov"):
        cov = float(arg)
-     elif opt in ("-p", "--cfile"):
+     elif opt in ("-x", "--xfile"):
        compfile = arg
 
 
