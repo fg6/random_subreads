@@ -229,7 +229,7 @@ def main(argv):
    global corrfact
    randord=[]
 
-   inputfile = '19503.fastq'
+   inputfile = ''
    ofaqtype = 'fastq'
    cov = 31
    refsize = 12*1000000
