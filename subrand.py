@@ -37,7 +37,7 @@ def read(inputfile,faqtype,cov,refsize):
 
   lrecords = list(SeqIO.parse(inputfile, faqtype))
 
-  listord=range(0,len(lrecords))
+  listord=list(range(0,len(lrecords)))
   nn=len(listord)
   for ir in range(0,nn):
     thisr=random.choice(listord)  
